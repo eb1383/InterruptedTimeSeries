@@ -20,69 +20,6 @@ file <- paste0("")
 # Load the dataset into a data frame
 df <- read.csv(paste(source, file, sep = "/"))
 
-### ADD WEEK ####
-# Define the start and end dates
-start_date <- as.Date("2014-01-01")
-end_date <- as.Date("2021-12-31")
-# Generate a sequence of dates between start and end
-seqdate <- seq(start_date, end_date, by = "days")
-# Filter the data frame to match the date range
-df <- df %>%
-  filter(date >= start_date & date <= end_date)
-# Create a 'week' column representing the week number of the year
-df$week <- lubridate::week(df$date)
-# Replace week 53 with week 52 (since some years have a 53rd week)
-df$week <- ifelse(df$week == 53, 52, df$week)
-# Create a continuous week column across years
-df$week <- with(df, (year(date) - min(year(date))) * 52 + week - min(week) + 1)
-
-### FILTER DATES ####
-# Filter the data frame to only include weeks 53 and beyond
-df <- df %>%
-  filter(week >= 53)
-# Adjust the 'week' column to make it continuous starting from 1
-df$week <- df$week - 52
-# Store the modified data frame as db for further use
-db <- df
-
-### ADD REGION ####
-# Define the source directory for region data
-source <- ""
-# Load region data (e.g., lsoa to region mapping)
-file <- paste0("") 
-reg <- read.csv(paste(source, file, sep = "/"))
-# Join the region data with the main dataset
-db <- left_join(db, reg, by = "lsoa", relationship = "many-to-many")
-# Summarise data by region and week
-db <- db %>%
-  group_by(region, week) %>%
-  summarise(
-    total_count = sum(count)
-  )
-
-### MISSING VALUES ####
-# Create a list of unique regions
-regions <- unique(db$region)
-# Create a complete dataset with all possible combinations of week and region
-complete_df <- expand.grid(week = 1:364, region = regions)
-# Merge the complete dataset with the actual data, filling in missing values
-final_df <- merge(complete_df, db, all.x = TRUE)
-# Replace any missing total_count values with 0
-final_df$total_count[is.na(final_df$total_count)] <- 0
-# Update db to reflect the complete dataset with missing values filled
-db <- final_df
-
-### ADD POPULATION DATA ####
-# Define the source and file for population data
-source <- ""
-file <- paste0("reg_pop.csv")
-# Load the population data
-pop <- read.csv(paste(source, file, sep = "/"))
-# Merge the population data with the main dataset
-db <- merge(db, pop, by = "region")
-# Update df to reflect the merged data
-df <- db
-
 ### FOURIER TERMS ####
 # Add Fourier terms to model seasonality (sine and cosine terms for weekly cycles)
 df$week_52_sin <- sin(2 * pi * df$week / 52)
