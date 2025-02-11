@@ -83,6 +83,19 @@ The script will generate plots comparing the actual incidence of *Campylobacter 
 ### Ready for Analysis:
 Once the script runs, you’ll have a dataset that includes both the actual and counterfactual *Campylobacter spp.* incidence, along with clear visual representations of how interventions might have affected the disease trend over time.
 
+## Anonymised Aggregated Data File 📊
+An anonymised, aggregated data file is included in this repository. It contains the weekly case counts and region data, which have been processed and anonymised to ensure privacy. This file allows you to skip ahead to the part of the analysis after the data aggregation is complete, making it easier to move forward with analysis without needing to repeat the data preprocessing steps.
+
+**Data Structure:**
+- **Week**: Continuous weekly index (ensuring no weeks are skipped).
+- **Region**: Identifiers for the different regions (anonymised for privacy).
+- **Total Case Count**: Aggregated cases for each week and region.
+
+You can load this file directly into the script to continue with the analysis from the aggregation stage.
+
+📝 **How to Use the Data File:**
+- After downloading the anonymised data file, simply update the file path in the script to point to this file.
+- You can now run the part of the script that follows the aggregation step, focusing on visualisation or model fitting as needed.
 
 ## 🤝 Contributions:
 Feel free to contribute! If you find any issues or have suggestions for improvements, feel free to submit a pull request. Together, we can make this analysis even better! ✨
